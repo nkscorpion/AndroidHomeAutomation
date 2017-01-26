@@ -10,7 +10,7 @@
 
     <string name="action_settings">Settings</string>
     <string name="title_activity_help">Help</string>
-    <string name="large_text">
+    <string name="help_text">
         "<b>How to use the app.</b>\n\n"
         "Method 1: Click on any card to toggle the current value.\n\n"
         "Method 2: Click on the action button on bottom left or mic icon the the action bar "
@@ -19,4 +19,8 @@
         " the light, you have to say, \" turn off the red light please \". And there you go the light"
         " will turn on/off according to you speech."
     </string>
+    <string name="blue_light">Blue Light</string>
+    <string name="green_bulb">Green Bulb</string>
+    <string name="off">OFF</string>
+    <string name="red_light">Red Light</string>
 </resources>

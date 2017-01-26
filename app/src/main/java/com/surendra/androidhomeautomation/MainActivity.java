@@ -3,6 +3,8 @@ package com.surendra.androidhomeautomation;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.os.Handler;
 import android.speech.RecognizerIntent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -18,15 +20,28 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.surendra.androidhomeautomation.fragment.NumberPickerFragment;
+
 import java.util.ArrayList;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener,
+        NumberPickerFragment.OnCompleteListener {
 
     private static final int REQ_CODE_SPEECH_INPUT = 100;
 
     private Bulb redBulb, greenBulb, blueBulb;
+
+    private TextView timerRed;
+    private TextView timerBlue;
+    private TextView timerGreen;
+
+    private CountDownTimer timer1;
+    private CountDownTimer timer2;
+    private CountDownTimer timer3;
+
+    private FloatingActionButton fab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +50,7 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -51,6 +66,11 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        //Timer Texts
+        timerRed = (TextView) findViewById(R.id.timer_red);
+        timerBlue = (TextView) findViewById(R.id.timer_blue);
+        timerGreen = (TextView) findViewById(R.id.timer_green);
 
         //Initializes the bulbs
         initBulb();
@@ -74,6 +94,42 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 greenBulb.toggle();
+            }
+        });
+
+        findViewById(R.id.redCard).setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                NumberPickerFragment newFragment = new NumberPickerFragment();
+                //newFragment.show(getActivity().getFragmentManager(), DIALOG_TIME);
+                newFragment.setId('r');
+                newFragment.setSwitchState(redBulb.mIsOn);
+                newFragment.show(MainActivity.this.getSupportFragmentManager(), "Red");
+                return true;
+            }
+        });
+
+        findViewById(R.id.blueCard).setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                NumberPickerFragment newFragment = new NumberPickerFragment();
+                //newFragment.show(getActivity().getFragmentManager(), DIALOG_TIME);
+                newFragment.setId('b');
+                newFragment.setSwitchState(blueBulb.mIsOn);
+                newFragment.show(MainActivity.this.getSupportFragmentManager(), "Blue");
+                return true;
+            }
+        });
+
+        findViewById(R.id.greenCard).setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                NumberPickerFragment newFragment = new NumberPickerFragment();
+                //newFragment.show(getActivity().getFragmentManager(), DIALOG_TIME);
+                newFragment.setId('g');
+                newFragment.setSwitchState(greenBulb.mIsOn);
+                newFragment.show(MainActivity.this.getSupportFragmentManager(), "Green");
+                return true;
             }
         });
     }
@@ -111,17 +167,17 @@ public class MainActivity extends AppCompatActivity
                     Toast.makeText(MainActivity.this, val, Toast.LENGTH_LONG).show();
                     //TODO: add timer functionality to automatically turn on/off after some time
                     val = val.toLowerCase();
-                    if(val.contains("all")){
-                        if(val.contains(" on")){
+                    if (val.contains("all")) {
+                        if (val.contains(" on")) {
                             redBulb.turnOn();
                             blueBulb.turnOn();
                             greenBulb.turnOn();
-                        }else if(val.contains(" off")){
+                        } else if (val.contains(" off")) {
                             redBulb.turnOff();
                             blueBulb.turnOff();
                             greenBulb.turnOff();
                         }
-                    }else if (val.contains(" and")) {
+                    } else if (val.contains(" and")) {
                         if (val.contains(" on")) {
                             if (val.contains(" red"))
                                 redBulb.turnOn();
@@ -129,7 +185,7 @@ public class MainActivity extends AppCompatActivity
                                 blueBulb.turnOn();
                             if (val.contains(" green"))
                                 greenBulb.turnOn();
-                        }else if(val.contains(" off")){
+                        } else if (val.contains(" off")) {
                             if (val.contains(" red"))
                                 redBulb.turnOff();
                             if (val.contains(" blue"))
@@ -137,7 +193,7 @@ public class MainActivity extends AppCompatActivity
                             if (val.contains(" green"))
                                 greenBulb.turnOff();
                         }
-                    }else if (val.contains("red")) {
+                    } else if (val.contains("red")) {
                         if (val.contains(" on")) {
                             redBulb.turnOn();
                         } else if (val.contains(" off")) {
@@ -218,4 +274,109 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    @Override
+    public void onComplete(char id, int time, final boolean toTurnOn) {
+        //Sets the bulb
+        Bulb bulb = null;
+        TextView timerText = null;
+        if (id == 'r') {
+            bulb = redBulb;
+            timerText = timerRed;
+        }
+        if (id == 'g') {
+            bulb = greenBulb;
+            timerText = timerGreen;
+        }
+        if (id == 'b') {
+            bulb = blueBulb;
+            timerText = timerBlue;
+        }
+
+        //A final timerText and bulb to be used by timer
+        final TextView finalTimerText = timerText;
+        final Bulb finalBulb = bulb;
+
+        //if appropriate bulb not found exit
+        if (bulb == null) return;
+
+        //If the state of bulb is equal to the toTurnOn then exit
+        if (toTurnOn == bulb.isBulbOn()) return;
+
+        if (time > 0) {
+            switch (id) {
+                case 'r':
+                    //Cancel the previous timer
+                    if (timer1 != null)
+                        timer1.cancel();
+                    //Creates new timer with the new time
+                    timer1 = new CountDownTimer(time, 1000) {
+                        public void onTick(long millisUntilFinished) {
+                            finalTimerText.setText(formatTimerValue(toTurnOn, millisUntilFinished));
+                        }
+
+                        public void onFinish() {
+                            finalTimerText.setText("");
+                            if (toTurnOn) {
+                                finalBulb.turnOn();
+                            } else {
+                                finalBulb.turnOff();
+                            }
+                        }
+                    }.start();
+                    break;
+                case 'g':
+                    //Cancel the previous timer
+                    if (timer2 != null)
+                        timer2.cancel();
+                    //Creates new timer with the new time
+                    timer2 = new CountDownTimer(time, 1000) {
+                        public void onTick(long millisUntilFinished) {
+                            finalTimerText.setText(formatTimerValue(toTurnOn, millisUntilFinished));
+                        }
+
+                        public void onFinish() {
+                            finalTimerText.setText("");
+                            if (toTurnOn) {
+                                finalBulb.turnOn();
+                            } else {
+                                finalBulb.turnOff();
+                            }
+                        }
+                    }.start();
+                    break;
+                case 'b':
+                    //Cancel the previous timer
+                    if (timer3 != null)
+                        timer3.cancel();
+                    //Creates new timer with the new time
+                    timer3 = new CountDownTimer(time, 1000) {
+                        public void onTick(long millisUntilFinished) {
+                            finalTimerText.setText(formatTimerValue(toTurnOn, millisUntilFinished));
+                        }
+
+                        public void onFinish() {
+                            finalTimerText.setText("");
+                            if (toTurnOn) {
+                                finalBulb.turnOn();
+                            } else {
+                                finalBulb.turnOff();
+                            }
+                        }
+                    }.start();
+                    break;
+            }
+        }
+    }
+
+    private String formatTimerValue(boolean toOn, long millis) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(millis / 1000);
+        builder.append("s to turn ");
+        if (toOn) {
+            builder.append(" On.");
+        } else {
+            builder.append(" Off.");
+        }
+        return builder.toString();
+    }
 }

@@ -44,4 +44,8 @@ public class Bulb {
         mImageView.setImageResource(R.drawable.bulb);
         //TODO: send this data to arduino or other microcontroller
     }
+
+    public boolean isBulbOn(){
+        return mIsOn;
+    }
 }
