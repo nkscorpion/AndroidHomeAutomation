@@ -21,7 +21,9 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_margin="8dp"
-            android:id="@+id/redCard">
+            android:id="@+id/redCard"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:clickable="true">
 
             <LinearLayout
                 android:orientation="vertical"
@@ -34,9 +36,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/red_bulb_img"
-                    android:src="@drawable/bulb" />
+                    android:src="@drawable/bulb"
+                    tools:ignore="ContentDescription" />
                 <TextView
-                    android:text="Red Light"
+                    android:text="@string/red_light"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/textView4"
@@ -44,7 +47,7 @@
                     android:gravity="center_horizontal" />
 
                 <TextView
-                    android:text="OFF"
+                    android:text="@string/off"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/red_bulb_state"
@@ -58,7 +61,9 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_margin="8dp"
-            android:id="@+id/blueCard">
+            android:id="@+id/blueCard"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:clickable="true">
 
             <LinearLayout
                 android:orientation="vertical"
@@ -71,9 +76,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/blue_bulb_img"
-                    android:src="@drawable/bulb" />
+                    android:src="@drawable/bulb"
+                    android:contentDescription=""
+                    tools:ignore="ContentDescription" />
                 <TextView
-                    android:text="Blue Light"
+                    android:text="@string/blue_light"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/textView231"
@@ -81,7 +88,7 @@
                     android:gravity="center_horizontal" />
 
                 <TextView
-                    android:text="OFF"
+                    android:text="@string/off"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/blue_bulb_state"
@@ -95,7 +102,9 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_margin="8dp"
-            android:id="@+id/greenCard">
+            android:id="@+id/greenCard"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:clickable="true">
 
             <LinearLayout
                 android:orientation="vertical"
@@ -108,9 +117,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/green_bulb_image"
-                    android:src="@drawable/bulb" />
+                    android:src="@drawable/bulb"
+                    tools:ignore="ContentDescription" />
                 <TextView
-                    android:text="Green Bulb"
+                    android:text="@string/green_bulb"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/textView2"
@@ -118,7 +128,7 @@
                     android:gravity="center_horizontal" />
 
                 <TextView
-                    android:text="OFF"
+                    android:text="@string/off"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/green_bulb_state"
