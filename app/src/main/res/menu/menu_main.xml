@@ -11,5 +11,5 @@
         android:id="@+id/action_speech"
         android:title="Speak"
         app:showAsAction="ifRoom"
-        android:icon="@drawable/mic_pic"/>
+        android:icon="@drawable/mic_pic" />
 </menu>

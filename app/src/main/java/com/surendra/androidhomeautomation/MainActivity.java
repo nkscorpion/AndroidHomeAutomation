@@ -3,6 +3,7 @@ package com.surendra.androidhomeautomation;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.speech.RecognizerIntent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -18,15 +19,23 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.surendra.androidhomeautomation.fragment.NumberPickerFragment;
+import com.surendra.androidhomeautomation.myClass.Light;
+
 import java.util.ArrayList;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener,
+        NumberPickerFragment.OnCompleteListener {
 
     private static final int REQ_CODE_SPEECH_INPUT = 100;
 
-    private Bulb redBulb, greenBulb, blueBulb;
+    private Light redLight;
+    private Light blueLight;
+    private Light greenLight;
+
+    private FloatingActionButton fab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +44,7 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -52,41 +61,77 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        //Initializes the bulbs
-        initBulb();
+        //Initializes the Lights
+        initLights();
 
         //Set OnClickListener
         findViewById(R.id.redCard).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                redBulb.toggle();
+                redLight.toggle();
             }
         });
 
         findViewById(R.id.blueCard).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                blueBulb.toggle();
+                blueLight.toggle();
             }
         });
 
         findViewById(R.id.greenCard).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                greenBulb.toggle();
+                greenLight.toggle();
+            }
+        });
+
+        findViewById(R.id.redCard).setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                NumberPickerFragment newFragment = new NumberPickerFragment();
+                //newFragment.show(getActivity().getFragmentManager(), DIALOG_TIME);
+                newFragment.setId('r');
+                newFragment.setSwitchState(redLight.isOn());
+                newFragment.show(MainActivity.this.getSupportFragmentManager(), "Red");
+                return true;
+            }
+        });
+
+        findViewById(R.id.blueCard).setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                NumberPickerFragment newFragment = new NumberPickerFragment();
+                //newFragment.show(getActivity().getFragmentManager(), DIALOG_TIME);
+                newFragment.setId('b');
+                newFragment.setSwitchState(blueLight.isOn());
+                newFragment.show(MainActivity.this.getSupportFragmentManager(), "Blue");
+                return true;
+            }
+        });
+
+        findViewById(R.id.greenCard).setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                NumberPickerFragment newFragment = new NumberPickerFragment();
+                //newFragment.show(getActivity().getFragmentManager(), DIALOG_TIME);
+                newFragment.setId('g');
+                newFragment.setSwitchState(greenLight.isOn());
+                newFragment.show(MainActivity.this.getSupportFragmentManager(), "Green");
+                return true;
             }
         });
     }
 
-    private void initBulb() {
-        redBulb = new Bulb('r', (ImageView) findViewById(R.id.red_bulb_img),
-                (TextView) findViewById(R.id.red_bulb_state), R.drawable.red_bulb);
+    private void initLights() {
+        redLight = new Light('r', R.drawable.red_bulb, (TextView) findViewById(R.id.red_bulb_state),
+                (ImageView) findViewById(R.id.red_bulb_img), (TextView) findViewById(R.id.timer_red));
 
-        greenBulb = new Bulb('g', (ImageView) findViewById(R.id.green_bulb_image),
-                (TextView) findViewById(R.id.green_bulb_state), R.drawable.green_bulb);
+        blueLight = new Light('b', R.drawable.blue_bulb, (TextView) findViewById(R.id.blue_bulb_state),
+                (ImageView) findViewById(R.id.blue_bulb_img), (TextView) findViewById(R.id.timer_blue));
 
-        blueBulb = new Bulb('b', (ImageView) findViewById(R.id.blue_bulb_img),
-                (TextView) findViewById(R.id.blue_bulb_state), R.drawable.blue_bulb);
+        greenLight = new Light('g', R.drawable.green_bulb, (TextView) findViewById(R.id.green_bulb_state),
+                (ImageView) findViewById(R.id.green_bulb_image), (TextView) findViewById(R.id.timer_green));
     }
 
     @Override
@@ -111,49 +156,49 @@ public class MainActivity extends AppCompatActivity
                     Toast.makeText(MainActivity.this, val, Toast.LENGTH_LONG).show();
                     //TODO: add timer functionality to automatically turn on/off after some time
                     val = val.toLowerCase();
-                    if(val.contains("all")){
-                        if(val.contains(" on")){
-                            redBulb.turnOn();
-                            blueBulb.turnOn();
-                            greenBulb.turnOn();
-                        }else if(val.contains(" off")){
-                            redBulb.turnOff();
-                            blueBulb.turnOff();
-                            greenBulb.turnOff();
-                        }
-                    }else if (val.contains(" and")) {
+                    if (val.contains("all")) {
                         if (val.contains(" on")) {
-                            if (val.contains(" red"))
-                                redBulb.turnOn();
-                            if (val.contains(" blue"))
-                                blueBulb.turnOn();
-                            if (val.contains(" green"))
-                                greenBulb.turnOn();
-                        }else if(val.contains(" off")){
-                            if (val.contains(" red"))
-                                redBulb.turnOff();
-                            if (val.contains(" blue"))
-                                blueBulb.turnOff();
-                            if (val.contains(" green"))
-                                greenBulb.turnOff();
-                        }
-                    }else if (val.contains("red")) {
-                        if (val.contains(" on")) {
-                            redBulb.turnOn();
+                            redLight.turnOn();
+                            blueLight.turnOn();
+                            greenLight.turnOn();
                         } else if (val.contains(" off")) {
-                            redBulb.turnOff();
+                            redLight.turnOff();
+                            blueLight.turnOff();
+                            greenLight.turnOff();
+                        }
+                    } else if (val.contains(" and")) {
+                        if (val.contains(" on")) {
+                            if (val.contains(" red"))
+                                redLight.turnOn();
+                            if (val.contains(" blue"))
+                                blueLight.turnOn();
+                            if (val.contains(" green"))
+                                greenLight.turnOn();
+                        } else if (val.contains(" off")) {
+                            if (val.contains(" red"))
+                                redLight.turnOff();
+                            if (val.contains(" blue"))
+                                blueLight.turnOff();
+                            if (val.contains(" green"))
+                                greenLight.turnOff();
+                        }
+                    } else if (val.contains("red")) {
+                        if (val.contains(" on")) {
+                            redLight.turnOn();
+                        } else if (val.contains(" off")) {
+                            redLight.turnOff();
                         }
                     } else if (val.contains("blue")) {
                         if (val.contains(" on")) {
-                            blueBulb.turnOn();
+                            blueLight.turnOn();
                         } else if (val.contains(" off")) {
-                            blueBulb.turnOff();
+                            blueLight.turnOff();
                         }
                     } else if (val.contains("green")) {
                         if (val.contains(" on")) {
-                            greenBulb.turnOn();
+                            greenLight.turnOn();
                         } else if (val.contains(" off")) {
-                            greenBulb.turnOff();
+                            greenLight.turnOff();
                         }
                     }
                     break;
@@ -218,4 +263,20 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    @Override
+    public void onComplete(char id, int time, final boolean toTurnOn) {
+        if (time > 0) {
+            switch (id) {
+                case 'r':
+                    redLight.setTimer(time, toTurnOn);
+                    break;
+                case 'g':
+                    greenLight.setTimer(time, toTurnOn);
+                    break;
+                case 'b':
+                    blueLight.setTimer(time, toTurnOn);
+                    break;
+            }
+        }
+    }
 }
