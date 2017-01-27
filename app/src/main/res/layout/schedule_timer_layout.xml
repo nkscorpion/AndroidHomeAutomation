@@ -20,5 +20,6 @@
         android:inputType="numberDecimal"
         android:ems="10"
         android:id="@+id/editTextTimer"
-        android:hint="Enter schedule time" />
+        android:hint="Enter schedule time"
+        style="@style/Widget.AppCompat.EditText" />
 </LinearLayout>

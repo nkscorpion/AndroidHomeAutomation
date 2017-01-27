@@ -4,7 +4,6 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.os.Handler;
 import android.speech.RecognizerIntent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -21,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.surendra.androidhomeautomation.fragment.NumberPickerFragment;
+import com.surendra.androidhomeautomation.myClass.Light;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -31,15 +31,9 @@ public class MainActivity extends AppCompatActivity
 
     private static final int REQ_CODE_SPEECH_INPUT = 100;
 
-    private Bulb redBulb, greenBulb, blueBulb;
-
-    private TextView timerRed;
-    private TextView timerBlue;
-    private TextView timerGreen;
-
-    private CountDownTimer timer1;
-    private CountDownTimer timer2;
-    private CountDownTimer timer3;
+    private Light redLight;
+    private Light blueLight;
+    private Light greenLight;
 
     private FloatingActionButton fab;
 
@@ -67,33 +61,28 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        //Timer Texts
-        timerRed = (TextView) findViewById(R.id.timer_red);
-        timerBlue = (TextView) findViewById(R.id.timer_blue);
-        timerGreen = (TextView) findViewById(R.id.timer_green);
-
-        //Initializes the bulbs
-        initBulb();
+        //Initializes the Lights
+        initLights();
 
         //Set OnClickListener
         findViewById(R.id.redCard).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                redBulb.toggle();
+                redLight.toggle();
             }
         });
 
         findViewById(R.id.blueCard).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                blueBulb.toggle();
+                blueLight.toggle();
             }
         });
 
         findViewById(R.id.greenCard).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                greenBulb.toggle();
+                greenLight.toggle();
             }
         });
 
@@ -103,7 +92,7 @@ public class MainActivity extends AppCompatActivity
                 NumberPickerFragment newFragment = new NumberPickerFragment();
                 //newFragment.show(getActivity().getFragmentManager(), DIALOG_TIME);
                 newFragment.setId('r');
-                newFragment.setSwitchState(redBulb.mIsOn);
+                newFragment.setSwitchState(redLight.isOn());
                 newFragment.show(MainActivity.this.getSupportFragmentManager(), "Red");
                 return true;
             }
@@ -115,7 +104,7 @@ public class MainActivity extends AppCompatActivity
                 NumberPickerFragment newFragment = new NumberPickerFragment();
                 //newFragment.show(getActivity().getFragmentManager(), DIALOG_TIME);
                 newFragment.setId('b');
-                newFragment.setSwitchState(blueBulb.mIsOn);
+                newFragment.setSwitchState(blueLight.isOn());
                 newFragment.show(MainActivity.this.getSupportFragmentManager(), "Blue");
                 return true;
             }
@@ -127,22 +116,22 @@ public class MainActivity extends AppCompatActivity
                 NumberPickerFragment newFragment = new NumberPickerFragment();
                 //newFragment.show(getActivity().getFragmentManager(), DIALOG_TIME);
                 newFragment.setId('g');
-                newFragment.setSwitchState(greenBulb.mIsOn);
+                newFragment.setSwitchState(greenLight.isOn());
                 newFragment.show(MainActivity.this.getSupportFragmentManager(), "Green");
                 return true;
             }
         });
     }
 
-    private void initBulb() {
-        redBulb = new Bulb('r', (ImageView) findViewById(R.id.red_bulb_img),
-                (TextView) findViewById(R.id.red_bulb_state), R.drawable.red_bulb);
+    private void initLights() {
+        redLight = new Light('r', R.drawable.red_bulb, (TextView) findViewById(R.id.red_bulb_state),
+                (ImageView) findViewById(R.id.red_bulb_img), (TextView) findViewById(R.id.timer_red));
 
-        greenBulb = new Bulb('g', (ImageView) findViewById(R.id.green_bulb_image),
-                (TextView) findViewById(R.id.green_bulb_state), R.drawable.green_bulb);
+        blueLight = new Light('b', R.drawable.blue_bulb, (TextView) findViewById(R.id.blue_bulb_state),
+                (ImageView) findViewById(R.id.blue_bulb_img), (TextView) findViewById(R.id.timer_blue));
 
-        blueBulb = new Bulb('b', (ImageView) findViewById(R.id.blue_bulb_img),
-                (TextView) findViewById(R.id.blue_bulb_state), R.drawable.blue_bulb);
+        greenLight = new Light('g', R.drawable.green_bulb, (TextView) findViewById(R.id.green_bulb_state),
+                (ImageView) findViewById(R.id.green_bulb_image), (TextView) findViewById(R.id.timer_green));
     }
 
     @Override
@@ -169,47 +158,47 @@ public class MainActivity extends AppCompatActivity
                     val = val.toLowerCase();
                     if (val.contains("all")) {
                         if (val.contains(" on")) {
-                            redBulb.turnOn();
-                            blueBulb.turnOn();
-                            greenBulb.turnOn();
+                            redLight.turnOn();
+                            blueLight.turnOn();
+                            greenLight.turnOn();
                         } else if (val.contains(" off")) {
-                            redBulb.turnOff();
-                            blueBulb.turnOff();
-                            greenBulb.turnOff();
+                            redLight.turnOff();
+                            blueLight.turnOff();
+                            greenLight.turnOff();
                         }
                     } else if (val.contains(" and")) {
                         if (val.contains(" on")) {
                             if (val.contains(" red"))
-                                redBulb.turnOn();
+                                redLight.turnOn();
                             if (val.contains(" blue"))
-                                blueBulb.turnOn();
+                                blueLight.turnOn();
                             if (val.contains(" green"))
-                                greenBulb.turnOn();
+                                greenLight.turnOn();
                         } else if (val.contains(" off")) {
                             if (val.contains(" red"))
-                                redBulb.turnOff();
+                                redLight.turnOff();
                             if (val.contains(" blue"))
-                                blueBulb.turnOff();
+                                blueLight.turnOff();
                             if (val.contains(" green"))
-                                greenBulb.turnOff();
+                                greenLight.turnOff();
                         }
                     } else if (val.contains("red")) {
                         if (val.contains(" on")) {
-                            redBulb.turnOn();
+                            redLight.turnOn();
                         } else if (val.contains(" off")) {
-                            redBulb.turnOff();
+                            redLight.turnOff();
                         }
                     } else if (val.contains("blue")) {
                         if (val.contains(" on")) {
-                            blueBulb.turnOn();
+                            blueLight.turnOn();
                         } else if (val.contains(" off")) {
-                            blueBulb.turnOff();
+                            blueLight.turnOff();
                         }
                     } else if (val.contains("green")) {
                         if (val.contains(" on")) {
-                            greenBulb.turnOn();
+                            greenLight.turnOn();
                         } else if (val.contains(" off")) {
-                            greenBulb.turnOff();
+                            greenLight.turnOff();
                         }
                     }
                     break;
@@ -276,107 +265,18 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onComplete(char id, int time, final boolean toTurnOn) {
-        //Sets the bulb
-        Bulb bulb = null;
-        TextView timerText = null;
-        if (id == 'r') {
-            bulb = redBulb;
-            timerText = timerRed;
-        }
-        if (id == 'g') {
-            bulb = greenBulb;
-            timerText = timerGreen;
-        }
-        if (id == 'b') {
-            bulb = blueBulb;
-            timerText = timerBlue;
-        }
-
-        //A final timerText and bulb to be used by timer
-        final TextView finalTimerText = timerText;
-        final Bulb finalBulb = bulb;
-
-        //if appropriate bulb not found exit
-        if (bulb == null) return;
-
-        //If the state of bulb is equal to the toTurnOn then exit
-        if (toTurnOn == bulb.isBulbOn()) return;
-
         if (time > 0) {
             switch (id) {
                 case 'r':
-                    //Cancel the previous timer
-                    if (timer1 != null)
-                        timer1.cancel();
-                    //Creates new timer with the new time
-                    timer1 = new CountDownTimer(time, 1000) {
-                        public void onTick(long millisUntilFinished) {
-                            finalTimerText.setText(formatTimerValue(toTurnOn, millisUntilFinished));
-                        }
-
-                        public void onFinish() {
-                            finalTimerText.setText("");
-                            if (toTurnOn) {
-                                finalBulb.turnOn();
-                            } else {
-                                finalBulb.turnOff();
-                            }
-                        }
-                    }.start();
+                    redLight.setTimer(time, toTurnOn);
                     break;
                 case 'g':
-                    //Cancel the previous timer
-                    if (timer2 != null)
-                        timer2.cancel();
-                    //Creates new timer with the new time
-                    timer2 = new CountDownTimer(time, 1000) {
-                        public void onTick(long millisUntilFinished) {
-                            finalTimerText.setText(formatTimerValue(toTurnOn, millisUntilFinished));
-                        }
-
-                        public void onFinish() {
-                            finalTimerText.setText("");
-                            if (toTurnOn) {
-                                finalBulb.turnOn();
-                            } else {
-                                finalBulb.turnOff();
-                            }
-                        }
-                    }.start();
+                    greenLight.setTimer(time, toTurnOn);
                     break;
                 case 'b':
-                    //Cancel the previous timer
-                    if (timer3 != null)
-                        timer3.cancel();
-                    //Creates new timer with the new time
-                    timer3 = new CountDownTimer(time, 1000) {
-                        public void onTick(long millisUntilFinished) {
-                            finalTimerText.setText(formatTimerValue(toTurnOn, millisUntilFinished));
-                        }
-
-                        public void onFinish() {
-                            finalTimerText.setText("");
-                            if (toTurnOn) {
-                                finalBulb.turnOn();
-                            } else {
-                                finalBulb.turnOff();
-                            }
-                        }
-                    }.start();
+                    blueLight.setTimer(time, toTurnOn);
                     break;
             }
         }
-    }
-
-    private String formatTimerValue(boolean toOn, long millis) {
-        StringBuilder builder = new StringBuilder();
-        builder.append(millis / 1000);
-        builder.append("s to turn ");
-        if (toOn) {
-            builder.append(" On.");
-        } else {
-            builder.append(" Off.");
-        }
-        return builder.toString();
     }
 }
